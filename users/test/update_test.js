@@ -18,6 +18,7 @@ describe('Updating records', ()=>{
                     done();
                 })
                 .catch((error) => {
+                    console.log(error)
                     assert(error,'Promise error');
                     done();
                 });
@@ -44,7 +45,7 @@ describe('Updating records', ()=>{
     it('class type update', (done)=>{
         //wrap helper function around it to test!
         assertName(
-            User.update({name:'Joe'}, {name:'Alex'}, done)
+            User.updateMany({name:'Joe'}, {name:'Alex'}, done)
         );
     });
     //this update is used on specific criteria
@@ -59,5 +60,16 @@ describe('Updating records', ()=>{
             User.findByIdAndUpdate(joe._id, {name: 'Alex'}, done)
         );
     })
+    it('class type update postcount incrementation', (done)=>{
+        //specific update to increment the postcount of a user!
+        // using MongoDB Update Operators to avoid loading all data into server!
+        //decrementation is done by incrementing a negative value 
+        User.update({name: 'Joe'}, {$inc: {postCount: 1}})
+            .then(()=>User.findOne({name:'Joe'}))
+            .then((user)=>{
+                assert(user.postCount === 1);
+                done();
+            })
+    });
     //sidenote all thou all tests are passing remember these methods are likely deprecated!
 })
